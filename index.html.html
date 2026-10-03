@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fintech Executive Dashboard PRO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: rgba(19, 27, 44, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --accent-green: #10b981;
+      --accent-red: #f43f5e;
+      --accent-purple: #8b5cf6;
+      --accent-amber: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body {
+      background: radial-gradient(circle at top right, #1e1b4b 0%, var(--bg-dark) 40%);
+      color: var(--text-main);
+      padding: 32px 20px;
+      max-width: 1350px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+
+    /* HEADER & MONTH SELECTOR */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--card-border);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-logo {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #fff; font-size: 20px;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+    }
+    h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .subtitle { font-size: 12px; color: var(--text-muted); }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+    .month-selector {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 8px 14px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn-backup {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-backup:hover { background: rgba(255, 255, 255, 0.15); }
+
+    /* KPIS GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 22px;
+      position: relative;
+      backdrop-filter: blur(16px);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .kpi-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 10px; }
+    .kpi-value { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+    .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+    .kpi-cyan .kpi-value { color: var(--accent-cyan); }
+    .kpi-red .kpi-value { color: var(--accent-red); }
+    .kpi-green .kpi-value { color: var(--accent-green); }
+    .kpi-purple .kpi-value { color: var(--accent-purple); }
+    .kpi-amber .kpi-value { color: var(--accent-amber); }
+
+    /* HEALTH BAR */
+    .health-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      backdrop-filter: blur(16px);
+    }
+    .health-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; font-weight: 700; }
+    .health-bar-bg { width: 100%; height: 14px; background: rgba(255,255,255,0.06); border-radius: 8px; overflow: hidden; display: flex; }
+    .health-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green)); transition: width 0.4s ease; }
+
+    /* MAIN GRID */
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+    @media (max-width: 1100px) { .grid-3 { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .panel-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--card-border);
+    }
+    .panel-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+    /* FORMS & INPUTS */
+    .form-inline { display: grid; grid-template-columns: 1.8fr 1fr 1.1fr auto; gap: 8px; margin-bottom: 16px; }
+    input, select {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 10px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; outline: none;
+    }
+    input:focus, select:focus { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(6,182,212,0.3); }
+    .btn-add {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      color: #fff; font-weight: 800; border: none; border-radius: 10px; padding: 0 16px; cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-add:hover { opacity: 0.9; }
+
+    /* ITEM LISTS */
+    .item-list { list-style: none; }
+    .item-row {
+      display: grid; grid-template-columns: 1.5fr 1fr 1fr auto auto auto; gap: 6px; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .item-row:last-child { border-bottom: none; }
+
+    .edit-field {
+      background: transparent; border: 1px solid transparent; color: var(--text-main);
+      font-size: 12px; font-weight: 600; padding: 4px 6px; border-radius: 6px; width: 100%;
+    }
+    .edit-field:hover, .edit-field:focus { background: rgba(0,0,0,0.5); border-color: var(--card-border); }
+    .edit-num { text-align: right; font-weight: 700; }
+
+    .badge-btn {
+      border: none; padding: 5px 8px; border-radius: 16px; font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; width: 100%; transition: all 0.2s;
+    }
+    .badge-btn.received { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .badge-btn.speculative { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
+    .badge-btn.paid { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+    .badge-btn.pending { background: rgba(244, 63, 94, 0.15); color: var(--accent-red); border: 1px solid var(--accent-red); }
+
+    .badge-cat {
+      background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); color: var(--text-muted);
+      border-radius: 12px; font-size: 10px; font-weight: 700; padding: 4px 6px; cursor: pointer; text-align: center;
+    }
+    .badge-cat.fijo { color: var(--accent-amber); border-color: var(--accent-amber); }
+    .badge-cat.variable { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+
+    .btn-action { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 4px; }
+    .btn-action:hover { color: var(--accent-cyan); }
+    .btn-action.has-notes { color: var(--accent-cyan); text-shadow: 0 0 8px var(--accent-cyan); }
+    .btn-del:hover { color: var(--accent-red); }
+
+    .panel-subtotal {
+      display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--text-muted);
+      padding-top: 10px; margin-top: 10px; border-top: 1px dashed var(--card-border);
+    }
+
+    /* EXECUTIVE REPORT CARD */
+    .report-card {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 28px; backdrop-filter: blur(16px);
+    }
+    .report-header { font-size: 18px; font-weight: 800; color: var(--accent-cyan); margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
+    .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+
+    .report-box { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--card-border); padding: 18px; border-radius: 14px; }
+    .report-box h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; }
+    .report-line { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+    .report-line span.val { font-weight: 800; }
+
+    /* MODAL VENTANILLA ESPECIFICACIONES */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+      display: none; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-content {
+      background: #0f172a; border: 1px solid var(--accent-cyan);
+      border-radius: 20px; padding: 24px; width: 90%; max-width: 450px;
+      box-shadow: 0 0 30px rgba(6,182,212,0.2);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .modal-title { font-weight: 800; font-size: 16px; color: var(--accent-cyan); }
+    .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer; }
+    textarea {
+      width: 100%; height: 100px; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border);
+      border-radius: 12px; color: var(--text-main); padding: 12px; font-size: 13px; outline: none; resize: none; margin-bottom: 16px;
+    }
+    textarea:focus { border-color: var(--accent-cyan); }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+    .btn-modal { background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)); color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-weight: 700; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">⚡</div>
+      <div>
+        <h1>Control Financiero Executive PRO</h1>
+        <div class="subtitle">Gestión Real, Presupuesto & Proyección Mensual</div>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <!-- SELECTOR DE MESES -->
+      <select id="month-select" class="month-selector" onchange="changeMonth()"></select>
+      <button class="btn-backup" onclick="exportData()">💾 Respaldar</button>
+      <button class="btn-backup" onclick="importData()">📂 Cargar</button>
+      <input type="file" id="file-input" style="display: none;" onchange="handleFileImport(event)">
+    </div>
+  </header>
+
+  <!-- KPIS PRINCIPALES -->
+  <div class="kpi-grid">
+    <div class="kpi-card purple">
+      <div class="kpi-title">📊 Total Generado Mes</div>
+      <div class="kpi-value" id="kpi-generated">$0</div>
+      <div class="kpi-sub">Sueldo + Resto + Especulativo</div>
+    </div>
+    <div class="kpi-card cyan">
+      <div class="kpi-title">💵 Saldo Actual Banco</div>
+      <div class="kpi-value" id="kpi-actual">$0</div>
+      <div class="kpi-sub">Caja real depositada hoy</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-title">🔒 Gastos Comprometidos</div>
+      <div class="kpi-value" id="kpi-committed">$0</div>
+      <div class="kpi-sub">Pendientes por pagar</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-title">🟢 Libre Real para Gastar</div>
+      <div class="kpi-value" id="kpi-free">$0</div>
+      <div class="kpi-sub">Sin comprometer deudas/ahorro</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-title">🔮 Proyección Final Mes</div>
+      <div class="kpi-value" id="kpi-projected">$0</div>
+      <div class="kpi-sub">Libre + Ingresos por cobrar</div>
+    </div>
+  </div>
+
+  <!-- BARRA DE SALUD -->
+  <div class="health-section">
+    <div class="health-header">
+      <span>Disponibilidad Real Limpia de Dinero</span>
+      <span id="health-text" style="color: var(--accent-cyan);">0% Libre</span>
+    </div>
+    <div class="health-bar-bg">
+      <div class="health-bar-fill" id="health-fill" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <!-- GRID DE CONTENIDO -->
+  <div class="grid-3">
+
+    <!-- PANEL 1: INGRESOS Y RESTO -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">💵 Ingresos & Resto</div>
+      </div>
+
+      <form class="form-inline" id="form-income">
+        <input type="text" id="inc-name" placeholder="Origen (ej. WAIS)" required>
+        <input type="number" id="inc-amount" placeholder="Monto ($)" required>
+        <select id="inc-type">
+          <option value="received">✅ Recibido</option>
+          <option value="speculative">🔮 Especulativo</option>
+        </select>
+        <button type="submit" class="btn-add">+</button>
+      </form>
+
+      <ul class="item-list" id="income-list"></ul>
+
+      <div class="panel-subtotal">
+        <span>Resto Mes Anterior:</span>
+        <span id="sub-resto" style="color: var(--text-main);">$0</span>
+      </div>
+      <div class="panel-subtotal">
+        <span>Especulativo Futuro:</span>
+        <span id="sub-speculative" style="color: var(--accent-purple);">$0</span>
+      </div>
+    </div>
+
+    <!-- PANEL 2: GASTOS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">💸 Gastos (Fijos / Variables)</div>
+      </div>
+
+      <form class="form-inline" id="form-expense">
+        <input type="text" id="exp-name" placeholder="Gasto (ej. Petróleo)" required>
+        <input type="number" id="exp-amount" placeholder="Monto ($)" required>
+        <select id="exp-cat">
+          <option value="fijo">📌 Fijo</option>
+          <option value="variable">🛒 Variable</option>
+        </select>
+        <button type="submit" class="btn-add">+</button>
+      </form>
+
+      <ul class="item-list" id="expense-list"></ul>
+
+      <div class="panel-subtotal">
+        <span>Gastos Fijos Pendientes:</span>
+        <span id="sub-fixed" style="color: var(--accent-amber);">$0</span>
+      </div>
+      <div class="panel-subtotal">
+        <span>Gastos Variables Pendientes:</span>
+        <span id="sub-var" style="color: var(--accent-cyan);">$0</span>
+      </div>
+    </div>
+
+    <!-- PANEL 3: AHORRO Y METAS -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">🏦 Cuentas de Ahorro</div>
+      </div>
+
+      <form class="form-inline" id="form-savings" style="grid-template-columns: 2fr 1fr auto;">
+        <input type="text" id="sav-name" placeholder="Fondo (ej. Emergencia)" required>
+        <input type="number" id="sav-amount" placeholder="Monto ($)" required>
+        <button type="submit" class="btn-add">+</button>
+      </form>
+
+      <ul class="item-list" id="savings-list"></ul>
+
+      <div class="panel-subtotal" style="border-top: 1px solid var(--card-border); margin-top: 16px;">
+        <span>Total Ahorrado Descontado:</span>
+        <span id="sub-savings" style="color: var(--accent-green);">$0</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INFORME EJECUTIVO -->
+  <div class="report-card">
+    <div class="report-header">📋 Informe Ejecutivo & Desglose Mensual</div>
+    <div class="report-grid">
+
+      <div class="report-box">
+        <h4>Flujo de Caja Real</h4>
+        <div class="report-line">
+          <span>Ingresos Totales Depositados</span>
+          <span class="val" id="rep-received">$0</span>
+        </div>
+        <div class="report-line">
+          <span>(-) Gastos Ya Pagados</span>
+          <span class="val" id="rep-paid" style="color: var(--accent-green);">$0</span>
+        </div>
+        <div class="report-line">
+          <span>(-) Fondo Ahorro Retirado</span>
+          <span class="val" id="rep-sav" style="color: var(--accent-amber);">$0</span>
+        </div>
+        <div class="report-line" style="border-top: 1px solid var(--card-border); padding-top: 6px; margin-top: 6px;">
+          <span>(=) Saldo Actual Real Banco</span>
+          <span class="val" id="rep-actual-banco" style="color: var(--accent-cyan);">$0</span>
+        </div>
+      </div>
+
+      <div class="report-box">
+        <h4>Estructura de Gastos</h4>
+        <div class="report-line">
+          <span>Gastos Fijos Totales (Pagados + Pend.)</span>
+          <span class="val" id="rep-fixed-total" style="color: var(--accent-amber);">$0</span>
+        </div>
+        <div class="report-line">
+          <span>Gastos Variables Totales</span>
+          <span class="val" id="rep-var-total" style="color: var(--accent-cyan);">$0</span>
+        </div>
+        <div class="report-line" style="border-top: 1px solid var(--card-border); padding-top: 6px; margin-top: 6px;">
+          <span>Compromisos Pendientes Totales</span>
+          <span class="val" id="rep-pending" style="color: var(--accent-red);">$0</span>
+        </div>
+      </div>
+
+      <div class="report-box">
+        <h4>Proyección & Alcance Diario</h4>
+        <div class="report-line">
+          <span>(+) Cobros Especulativos Futuros</span>
+          <span class="val" id="rep-speculative" style="color: var(--accent-purple);">$0</span>
+        </div>
+        <div class="report-line">
+          <span>Presupuesto Diario Restante</span>
+          <span class="val" id="rep-daily" style="color: var(--accent-green);">$0 / día</span>
+        </div>
+        <div class="report-line" style="border-top: 1px solid var(--card-border); padding-top: 6px; margin-top: 6px;">
+          <span>(=) Saldo Final Proyectado</span>
+          <span class="val" id="rep-final-projected" style="color: var(--accent-amber);">$0</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- VENTANILLA / MODAL DE ESPECIFICACIONES -->
+  <div class="modal-overlay" id="notes-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-item-title">Especificaciones del Registro</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <textarea id="modal-notes" placeholder="Agrega notas, detalles de compra, cuotas o especificaciones aquí..."></textarea>
+      <div class="modal-footer">
+        <button class="btn-modal" onclick="saveNotes()">Guardar Detalles</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ESTADO GENERAL POR MESES
+    let currentMonthKey = '2026-10'; // Mes por defecto
+    let activeModalItem = null; // Para referenciar qué registro se está editando en la ventanita
+
+    // Datos iniciales base por si no existen en el almacenamiento
+    const defaultData = {
+      incomes: [
+        { id: 1, name: 'Sueldo', amount: 218000, type: 'received', notes: '' },
+        { id: 2, name: 'Resto Mes Anterior', amount: 6400, type: 'received', isRest: true, notes: '' },
+        { id: 3, name: 'Pago Deuda Maritza', amount: 60000, type: 'speculative', notes: '' },
+        { id: 4, name: 'Proyecto WAIS', amount: 50000, type: 'speculative', notes: '' }
+      ],
+      expenses: [
+        { id: 1, name: 'Tarjeta BancoEstado', amount: 4900, category: 'fijo', status: 'paid', notes: 'Pago automático cuota 1/3' },
+        { id: 2, name: 'Ceviche', amount: 3500, category: 'variable', status: 'paid', notes: '' },
+        { id: 3, name: 'Yerba', amount: 25000, category: 'variable', status: 'pending', notes: '' },
+        { id: 4, name: 'Petróleo', amount: 20000, category: 'variable', status: 'pending', notes: 'Cargar en la Shell de la avenida' },
+        { id: 5, name: 'Tabaco', amount: 8000, category: 'variable', status: 'pending', notes: '' },
+        { id: 6, name: 'Bebidas', amount: 7200, category: 'variable', status: 'pending', notes: '' }
+      ],
+      savings: [
+        { id: 1, name: 'Ahorro del Mes', amount: 5000, notes: '' }
+      ]
+    };
+
+    let allMonthsData = JSON.parse(localStorage.getItem('fintech_pro_months_db')) || {
+      '2026-10': defaultData
+    };
+
+    let state = allMonthsData[currentMonthKey] || { incomes: [], expenses: [], savings: [] };
+
+    // INICIALIZACIÓN DE MESES
+    function initMonthSelector() {
+      const selector = document.getElementById('month-select');
+      selector.innerHTML = '';
+      
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      
+      // Generar rango de meses (ej: 2026-01 a 2027-12)
+      for (let year = 2026; year <= 2027; year++) {
+        for (let m = 0; m < 12; m++) {
+          const mStr = (m + 1).toString().padStart(2, '0');
+          const key = `${year}-${mStr}`;
+          const option = document.createElement('option');
+          option.value = key;
+          option.innerText = `${monthNames[m].toUpperCase()} ${year}`;
+          if (key === currentMonthKey) option.selected = true;
+          selector.appendChild(option);
+        }
+      }
+    }
+
+    function changeMonth() {
+      currentMonthKey = document.getElementById('month-select').value;
+      if (!allMonthsData[currentMonthKey]) {
+        // Inicializar mes limpio
+        allMonthsData[currentMonthKey] = { incomes: [], expenses: [], savings: [] };
+      }
+      state = allMonthsData[currentMonthKey];
+      saveState();
+    }
+
+    function saveState() {
+      allMonthsData[currentMonthKey] = state;
+      localStorage.setItem('fintech_pro_months_db', JSON.stringify(allMonthsData));
+      render();
+    }
+
+    function formatCLP(val) {
+      return '$' + Math.round(val).toLocaleString('es-CL');
+    }
+
+    // MANEJO DE VENTANA EMERGENTE (MODAL DE ESPECIFICACIONES)
+    function openModal(collection, id) {
+      const item = state[collection].find(x => x.id === id);
+      if (!item) return;
+      activeModalItem = { collection, id };
+      document.getElementById('modal-item-title').innerText = `Detalles: ${item.name}`;
+      document.getElementById('modal-notes').value = item.notes || '';
+      document.getElementById('notes-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('notes-modal').classList.remove('active');
+      activeModalItem = null;
+    }
+
+    function saveNotes() {
+      if (!activeModalItem) return;
+      const { collection, id } = activeModalItem;
+      const item = state[collection].find(x => x.id === id);
+      if (item) {
+        item.notes = document.getElementById('modal-notes').value;
+        saveState();
+      }
+      closeModal();
+    }
+
+    // ACCIONES EN PANTALLA
+    function updateIncome(id, field, value) {
+      const item = state.incomes.find(i => i.id === id);
+      if (item) {
+        item[field] = field === 'amount' ? (parseFloat(value) || 0) : value;
+        saveState();
+      }
+    }
+
+    function updateExpense(id, field, value) {
+      const item = state.expenses.find(e => e.id === id);
+      if (item) {
+        item[field] = field === 'amount' ? (parseFloat(value) || 0) : value;
+        saveState();
+      }
+    }
+
+    function updateSavings(id, field, value) {
+      const item = state.savings.find(s => s.id === id);
+      if (item) {
+        item[field] = field === 'amount' ? (parseFloat(value) || 0) : value;
+        saveState();
+      }
+    }
+
+    // FORMULARIO SUBMITS
+    document.getElementById('form-income').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('inc-name').value;
+      const amount = parseFloat(document.getElementById('inc-amount').value);
+      const type = document.getElementById('inc-type').value;
+      state.incomes.push({ id: Date.now(), name, amount, type, notes: '' });
+      document.getElementById('inc-name').value = '';
+      document.getElementById('inc-amount').value = '';
+      saveState();
+    });
+
+    document.getElementById('form-expense').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('exp-name').value;
+      const amount = parseFloat(document.getElementById('exp-amount').value);
+      const category = document.getElementById('exp-cat').value;
+      state.expenses.push({ id: Date.now(), name, amount, category, status: 'pending', notes: '' });
+      document.getElementById('exp-name').value = '';
+      document.getElementById('exp-amount').value = '';
+      saveState();
+    });
+
+    document.getElementById('form-savings').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('sav-name').value;
+      const amount = parseFloat(document.getElementById('sav-amount').value);
+      state.savings.push({ id: Date.now(), name, amount, notes: '' });
+      document.getElementById('sav-name').value = '';
+      document.getElementById('sav-amount').value = '';
+      saveState();
+    });
+
+    function deleteItem(type, id) {
+      state[type] = state[type].filter(x => x.id !== id);
+      saveState();
+    }
+
+    // EXPORTACIÓN E IMPORTACIÓN DE RESPALDOS
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allMonthsData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `respaldo_finanzas_${currentMonthKey}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData() {
+      document.getElementById('file-input').click();
+    }
+
+    function handleFileImport(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          allMonthsData = imported;
+          localStorage.setItem('fintech_pro_months_db', JSON.stringify(allMonthsData));
+          changeMonth();
+          alert('¡Datos cargados con éxito!');
+        } catch(err) {
+          alert('Error al leer el archivo JSON');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // RENDERIZADO PRINCIPAL
+    function render() {
+      // 1. CÁLCULOS
+      const totalReceived = state.incomes.filter(i => i.type === 'received').reduce((a, b) => a + b.amount, 0);
+      const totalSpeculative = state.incomes.filter(i => i.type === 'speculative').reduce((a, b) => a + b.amount, 0);
+      const totalGenerated = totalReceived + totalSpeculative;
+      const restoAnterior = state.incomes.filter(i => i.isRest).reduce((a, b) => a + b.amount, 0);
+
+      const totalPaid = state.expenses.filter(e => e.status === 'paid').reduce((a, b) => a + b.amount, 0);
+      const totalCommitted = state.expenses.filter(e => e.status === 'pending').reduce((a, b) => a + b.amount, 0);
+      
+      const totalFixed = state.expenses.filter(e => e.category === 'fijo').reduce((a, b) => a + b.amount, 0);
+      const totalVar = state.expenses.filter(e => e.category === 'variable').reduce((a, b) => a + b.amount, 0);
+
+      const totalFixedPending = state.expenses.filter(e => e.category === 'fijo' && e.status === 'pending').reduce((a, b) => a + b.amount, 0);
+      const totalVarPending = state.expenses.filter(e => e.category === 'variable' && e.status === 'pending').reduce((a, b) => a + b.amount, 0);
+
+      const totalSavings = state.savings.reduce((a, b) => a + b.amount, 0);
+
+      const actualBanco = totalReceived - totalPaid - totalSavings;
+      const freeReal = actualBanco - totalCommitted;
+      const finalProjected = freeReal + totalSpeculative;
+
+      // ACTUALIZAR KPIS
+      document.getElementById('kpi-generated').innerText = formatCLP(totalGenerated);
+      document.getElementById('kpi-actual').innerText = formatCLP(actualBanco);
+      document.getElementById('kpi-committed').innerText = formatCLP(totalCommitted);
+      document.getElementById('kpi-free').innerText = formatCLP(freeReal);
+      document.getElementById('kpi-projected').innerText = formatCLP(finalProjected);
+
+      // SUBTOTALES
+      document.getElementById('sub-resto').innerText = formatCLP(restoAnterior);
+      document.getElementById('sub-speculative').innerText = formatCLP(totalSpeculative);
+      document.getElementById('sub-fixed').innerText = formatCLP(totalFixedPending);
+      document.getElementById('sub-var').innerText = formatCLP(totalVarPending);
+      document.getElementById('sub-savings').innerText = formatCLP(totalSavings);
+
+      // BARRA DE SALUD
+      const freePct = actualBanco > 0 ? Math.max(0, Math.min(100, (freeReal / actualBanco) * 100)) : 0;
+      document.getElementById('health-fill').style.width = freePct + '%';
+      document.getElementById('health-text').innerText = `${Math.round(freePct)}% del Saldo Banco Libre sin Comprometer`;
+
+      // RENDER LISTA INGRESOS
+      const incList = document.getElementById('income-list');
+      incList.innerHTML = '';
+      state.incomes.forEach(i => {
+        const hasNotes = i.notes && i.notes.trim().length > 0;
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.innerHTML = `
+          <input type="text" class="edit-field" value="${i.name}" onchange="updateIncome(${i.id}, 'name', this.value)">
+          <input type="number" class="edit-field edit-num" value="${i.amount}" onchange="updateIncome(${i.id}, 'amount', this.value)">
+          <button class="badge-btn ${i.type}" onclick="updateIncome(${i.id}, 'type', '${i.type === 'received' ? 'speculative' : 'received'}')">
+            ${i.type === 'received' ? '✅ Recibido' : '🔮 Especulativo'}
+          </button>
+          <span></span>
+          <button class="btn-action ${hasNotes ? 'has-notes' : ''}" title="Notas / Especificaciones" onclick="openModal('incomes', ${i.id})">📝</button>
+          <button class="btn-action btn-del" onclick="deleteItem('incomes', ${i.id})">✕</button>
+        `;
+        incList.appendChild(li);
+      });
+
+      // RENDER LISTA GASTOS
+      const expList = document.getElementById('expense-list');
+      expList.innerHTML = '';
+      state.expenses.forEach(e => {
+        const hasNotes = e.notes && e.notes.trim().length > 0;
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.innerHTML = `
+          <input type="text" class="edit-field" value="${e.name}" onchange="updateExpense(${e.id}, 'name', this.value)">
+          <input type="number" class="edit-field edit-num" value="${e.amount}" onchange="updateExpense(${e.id}, 'amount', this.value)">
+          <button class="badge-btn ${e.status}" onclick="updateExpense(${e.id}, 'status', '${e.status === 'paid' ? 'pending' : 'paid'}')">
+            ${e.status === 'paid' ? '✅ Pagado' : '🔜 Pendiente'}
+          </button>
+          <button class="badge-cat ${e.category || 'variable'}" onclick="updateExpense(${e.id}, 'category', '${e.category === 'fijo' ? 'variable' : 'fijo'}')">
+            ${e.category === 'fijo' ? '📌 Fijo' : '🛒 Var'}
+          </button>
+          <button class="btn-action ${hasNotes ? 'has-notes' : ''}" title="Notas / Especificaciones" onclick="openModal('expenses', ${e.id})">📝</button>
+          <button class="btn-action btn-del" onclick="deleteItem('expenses', ${e.id})">✕</button>
+        `;
+        expList.appendChild(li);
+      });
+
+      // RENDER LISTA AHORROS
+      const savList = document.getElementById('savings-list');
+      savList.innerHTML = '';
+      state.savings.forEach(s => {
+        const hasNotes = s.notes && s.notes.trim().length > 0;
+        const li = document.createElement('li');
+        li.className = 'item-row';
+        li.style.gridTemplateColumns = '1.5fr 1fr auto auto auto';
+        li.innerHTML = `
+          <input type="text" class="edit-field" value="${s.name}" onchange="updateSavings(${s.id}, 'name', this.value)">
+          <input type="number" class="edit-field edit-num" style="color: var(--accent-green);" value="${s.amount}" onchange="updateSavings(${s.id}, 'amount', this.value)">
+          <span></span>
+          <button class="btn-action ${hasNotes ? 'has-notes' : ''}" title="Notas / Especificaciones" onclick="openModal('savings', ${s.id})">📝</button>
+          <button class="btn-action btn-del" onclick="deleteItem('savings', ${s.id})">✕</button>
+        `;
+        savList.appendChild(li);
+      });
+
+      // RENDER INFORME EJECUTIVO
+      document.getElementById('rep-received').innerText = formatCLP(totalReceived);
+      document.getElementById('rep-paid').innerText = formatCLP(totalPaid);
+      document.getElementById('rep-sav').innerText = formatCLP(totalSavings);
+      document.getElementById('rep-actual-banco').innerText = formatCLP(actualBanco);
+
+      document.getElementById('rep-fixed-total').innerText = formatCLP(totalFixed);
+      document.getElementById('rep-var-total').innerText = formatCLP(totalVar);
+      document.getElementById('rep-pending').innerText = formatCLP(totalCommitted);
+
+      document.getElementById('rep-speculative').innerText = formatCLP(totalSpeculative);
+      const daily = Math.max(0, Math.round(freeReal / 30));
+      document.getElementById('rep-daily').innerText = `${formatCLP(daily)} / día`;
+      document.getElementById('rep-final-projected').innerText = formatCLP(finalProjected);
+    }
+
+    // ARRANCAR
+    initMonthSelector();
+    render();
+  </script>
+</body>
+</html>
